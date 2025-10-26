@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import dotenv from "dotenv";
 import { sql } from "./config/db.js";
 
@@ -65,6 +65,35 @@ if(isNaN(parseInt(id))) {
       console.error("Error deleting the transactions:", error);
   res.status(500).json({ error: "Internal Server Error" });
     
+  }
+})
+
+app.get("/api/transactions/summary/:userId", async (req, res) => {
+
+
+  try {
+     const {userId} = req.params
+    // we put 0 as the fall back value because when you just sign up, you have no transactions
+  const totalBalanceResult = await sql `
+  SELECT COALESCE(SUM(amount), 0) as balance FROM transactions WHERE user_id = ${userId}
+  `
+
+  const incomeResult = await sql `
+   SELECT COALESCE(SUM(amount), 0) as income  FROM transactions WHERE user_id = ${userId} AND amount > 0
+  `
+
+   const expenseResult = await sql `
+   SELECT COALESCE(SUM(amount), 0) as expense  FROM transactions WHERE user_id = ${userId} AND amount < 0
+
+  `
+   res.status(200).json({
+    balance: totalBalanceResult[0].balance,
+    income: incomeResult[0].income,
+    expense: expenseResult[0].expense
+  })
+  } catch (error) {
+      console.error("Error getting transaction Summary:", error);
+  res.status(500).json({ error: "Internal Server Error" });
   }
 })
 
