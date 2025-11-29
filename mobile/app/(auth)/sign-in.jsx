@@ -1,7 +1,12 @@
 import { useSignIn } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { styles } from '../../assets/styles/auth.styles'
+import { Image } from 'expo-image'
+import { COLORS } from '../../constants/colors';
+import { Ionicons } from '@expo/vector-icons'
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -9,6 +14,7 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [error, setError] = useState("")
 
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
@@ -39,29 +45,60 @@ export default function Page() {
   }
 
   return (
-    <View>
-      <Text>Sign in</Text>
+    <KeyboardAwareScrollView
+     style={{flex:1}}
+    contentContainerStyle={{flexGrow:1}}
+    enableOnAndroid={true}
+    enableAutomaticScroll={true}
+    // extraScrollHeight={100}
+    
+    >
+      <View style={styles.container}>
+        <Image source={require("../../assets/images/revenue-i4.png")} style={styles.illustration}/>
+
+    <Text style={styles.title}>Welcome Back 👋</Text>
+ {error ? (
+        <View style={styles.errorBox}>
+          <Ionicons name='alert-circle' size={20} color={COLORS.expense}/>
+            <Text style ={styles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={() => setError("")}>
+               <Ionicons name='close' size={20} color={COLORS.text}/>
+            </TouchableOpacity>
+        </View>
+
+        ):null}
       <TextInput
+      style={[styles.input, error && styles.errorInput]}
         autoCapitalize="none"
         value={emailAddress}
         placeholder="Enter email"
         onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
       />
       <TextInput
+      style={[styles.input, error && styles.errorInput]}
         value={password}
         placeholder="Enter password"
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />
-      <TouchableOpacity onPress={onSignInPress}>
-        <Text>Continue</Text>
+      <TouchableOpacity  style={styles.button} onPress={onSignInPress}>
+        <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
-      <View style={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-        <Link href="/sign-up">
-          <Text>Sign up</Text>
-        </Link>
+      <View style={styles.footerContainer}>
+     
+               <Text style ={styles.footerText}>Do&apos;nt have an account?</Text>
+               <Link href="/sign-up" asChild>
+                 <TouchableOpacity>
+                 <Text style={styles.linkText}>Sign up</Text>
+                 
+               </TouchableOpacity>
+               </Link>
+             
+            
+             </View>
       </View>
-    </View>
+     
+    </KeyboardAwareScrollView>
   )
 }
 
