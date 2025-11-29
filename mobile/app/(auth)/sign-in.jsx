@@ -38,11 +38,15 @@ export default function Page() {
         console.error(JSON.stringify(signInAttempt, null, 2))
       }
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+    if (err?.errors?.[0]?.code === "form_password_incorrect") {
+    setError("Password is incorrect. Please try again");
+    } else {
+    setError("An error occurred, please try again");
     }
+    // console.error(JSON.stringify(err, null, 2));
   }
+  }
+
 
   return (
     <KeyboardAwareScrollView
@@ -50,7 +54,7 @@ export default function Page() {
     contentContainerStyle={{flexGrow:1}}
     enableOnAndroid={true}
     enableAutomaticScroll={true}
-    // extraScrollHeight={100}
+     extraScrollHeight={100}
     
     >
       <View style={styles.container}>
